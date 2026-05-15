@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trivia</title>
+  <title>Trivia🌷</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #f0fdf4; font-family: system-ui, sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
@@ -49,7 +49,7 @@
   <div class="card" id="intro-card">
     <div class="icon">🌷</div>
     <h1>Trivia</h1>
-    <p>5 preguntas muy específicas.<br>Algunas fáciles, una que otra trampa.<br>Buena suerte</p>
+    <p>5 preguntas muy específicas.<br>Algunas fáciles, una que otra con trampa.<br>Buena suerte</p>
     <button id="start-btn">Empezar →</button>
   </div>
 
@@ -103,7 +103,7 @@ const qs = [
   },
   {
     cat: "Pregunta 3 de 5",
-    q: "Cambiando roles, teacher: ¿cuál es el color favorito actual de Mariana?",
+    q: "¿cuál es el color favorito actual de Mariana?",
     opts: [
       "Naranja",
       "Morado",
@@ -126,18 +126,6 @@ const qs = [
     correct: 1,
     ok: "C.S. Lewis. Lectoras de buen gusto.",
     fail: "Era C.S. Lewis. Eso sí que es trampa para una lectora."
-  },
-  {
-    cat: "Pregunta 5 de 5",
-    q: "Si el cordi le da el día, ¿qué hace Mariana?",
-    opts: [
-      "Nadota",
-      "Le manda unas flores del patron",
-      "Le pone un cirio"
-    ],
-    correct: 2,
-    ok: "Exacto. Un cirio por sus buenas acciones.",
-    fail: "Sonia... la respuesta correcta incluye un cirio."
   }
 ];
 
@@ -203,13 +191,13 @@ function showResult(){
   if(score===5){
     icon='👏'; title='5 de 5 — Excelente, Sonia.';
   } else if(score>=3){
-    icon='🍀'; title=score+' de 5 — nada mal, teacher.';
+    icon='🍀'; title=score+' de 5 — Nada mal.';
   } else {
-    icon='☕'; title=score+' de 5 — hay que tomar más café juntas.';
+    icon='☕'; title=score+' de 5 — Hay que tomar más café juntas.';
   }
   document.getElementById('res-icon').textContent = icon;
   document.getElementById('res-title').textContent = title;
-  document.getElementById('res-msg').textContent = 'Hay personas que marcan la diferencia, y tú eres una de ellas. Te admiro mucho, Sonia — por la maestra que eres, por la persona que eres fuera del salón, y por seguir eligiendo enseñar con tanto cariño. Feliz Día del Maestro. 🍀';
+  document.getElementById('res-msg').textContent = 'Feliz Día del Maestro.🎈';
 }
 
 document.getElementById('start-btn').onclick = ()=>{
