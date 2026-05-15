@@ -69,7 +69,7 @@
   <div class="card" id="intro-card">
     <div class="icon">🌷</div>
     <h1>Trivia</h1>
-    <p>5 preguntas muy específicas.<br>Algunas fáciles, una que otra con trampa.<br>Buena suerte</p>
+    <p>4 preguntas muy específicas.<br>Algunas fáciles, una que otra con trampa.<br>Buena suerte</p>
     <button id="start-btn">Empezar →</button>
   </div>
 
@@ -239,11 +239,11 @@ function showResult(){
   
   let icon, title;
   if(score === qs.length){
-    icon='🏆'; title='¡Perfecto! ' + score + ' de ' + qs.length;
+    icon='🏆'; title='¡Excelente! ' + score + ' de ' + qs.length;
   } else if(score >= 3){
     icon='🍀'; title=score + ' de ' + qs.length + ' — ¡Muy bien!';
   } else {
-    icon='☕'; title=score + ' de ' + qs.length + ' — ¡A por más café!';
+    icon='☕'; title=score + ' de ' + qs.length + ' — ¡Puedes intentarlo otra vez!';
   }
   
   document.getElementById('res-icon').textContent = icon;
