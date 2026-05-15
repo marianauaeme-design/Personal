@@ -4,11 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trivia🌷</title>
+  <!-- Agregamos la librería para los globos/confeti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #f0fdf4; font-family: system-ui, sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
-    #app { max-width: 560px; width: 100%; }
-    .card { background: #fff; border: 1px solid #d1fae5; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; }
+    body { background: #f0fdf4; font-family: system-ui, sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; overflow-x: hidden; }
+    #app { max-width: 560px; width: 100%; position: relative; z-index: 10; }
+    .card { background: #fff; border: 1px solid #d1fae5; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
     .badge { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; margin-bottom: 0.75rem; background: #d1fae5; color: #065f46; }
     .q-text { font-size: 17px; font-weight: 600; color: #1a1a1a; line-height: 1.5; margin-bottom: 1.25rem; }
     .opts { display: flex; flex-direction: column; gap: 8px; }
@@ -35,13 +37,31 @@
     #start-btn { padding: 11px 32px; border-radius: 10px; border: none; background: #059669; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
     #start-btn:hover { background: #047857; }
     #q-card { display: none; }
-    #result-card { display: none; text-align: center; padding: 2rem 1.5rem; }
-    #result-card .icon { font-size: 48px; margin-bottom: 1rem; }
-    #result-card h2 { font-size: 20px; font-weight: 700; color: #065f46; margin-bottom: 1rem; }
-    #result-card .msg { font-size: 15px; color: #374151; line-height: 1.8; text-align: left; border-left: 3px solid #6ee7b7; padding-left: 1rem; margin-bottom: 0.5rem; }
-    #result-card .firma { font-size: 14px; color: #059669; margin-top: 0.75rem; font-style: italic; }
-    #replay-btn { margin-top: 1.25rem; padding: 10px 26px; border-radius: 10px; border: 1px solid #d1d5db; background: #fff; color: #1a1a1a; font-size: 14px; cursor: pointer; }
-    #replay-btn:hover { background: #f9fafb; }
+    
+    /* ESTILOS PARA EL RESULTADO FINAL */
+    #result-card { display: none; text-align: center; padding: 2.5rem 1.5rem; }
+    #result-card .icon { font-size: 54px; margin-bottom: 1rem; }
+    #result-card h2 { font-size: 20px; font-weight: 700; color: #065f46; margin-bottom: 1.5rem; }
+    
+    /* El texto de Feliz día en grande */
+    .feliz-dia { 
+      font-size: 32px; 
+      font-weight: 800; 
+      color: #059669; 
+      display: block; 
+      margin: 1rem 0;
+      line-height: 1.2;
+      animation: pop 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+    }
+    
+    @keyframes pop {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    #result-card .msg { font-size: 15px; color: #374151; line-height: 1.8; text-align: left; border-left: 3px solid #6ee7b7; padding-left: 1rem; margin-bottom: 1rem; }
+    #result-card .firma { font-size: 16px; color: #059669; margin-top: 1rem; font-style: italic; font-weight: 600; }
+    #replay-btn { margin-top: 1.5rem; padding: 10px 26px; border-radius: 10px; border: 1px solid #d1d5db; background: #fff; color: #1a1a1a; font-size: 14px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -68,6 +88,8 @@
     <div class="icon" id="res-icon"></div>
     <h2 id="res-title"></h2>
     <p class="msg" id="res-msg"></p>
+    <!-- Contenedor para el texto grande -->
+    <span class="feliz-dia">¡Feliz Día del Maestro! 🎈</span>
     <p class="firma">— Mariana</p>
     <button id="replay-btn">Jugar de nuevo</button>
   </div>
@@ -76,7 +98,7 @@
 <script>
 const qs = [
   {
-    cat: "Pregunta 1 de 5",
+    cat: "Pregunta 1 de 4",
     q: "Mariana cree que tu café ideal es...",
     opts: [
       "Frío, con hielo y caramelo",
@@ -89,7 +111,7 @@ const qs = [
     fail: "Hmm... ¿en serio? El Baileys dice que no te reconoce."
   },
   {
-    cat: "Pregunta 2 de 5",
+    cat: "Pregunta 2 de 4",
     q: "Cuando fuiste al teatro con Mariana. ¿Qué obra vieron?",
     opts: [
       "La bella durmiente",
@@ -102,7 +124,7 @@ const qs = [
     fail: "Ay, Sonia... fue El Cascanueces. ¡Ese día lo viviste tú!"
   },
   {
-    cat: "Pregunta 3 de 5",
+    cat: "Pregunta 3 de 4",
     q: "¿cuál es el color favorito actual de Mariana?",
     opts: [
       "Naranja",
@@ -115,7 +137,7 @@ const qs = [
     fail: "Era azul, Sonia. Azul. Tarea para casa: conocer mejor a Mariana."
   },
   {
-    cat: "Pregunta 4 de 5",
+    cat: "Pregunta 4 de 4",
     q: "Un libro que las dos leyeron: Cartas del diablo a su sobrino. ¿Quién lo escribió?",
     opts: [
       "J.R.R. Tolkien",
@@ -130,6 +152,33 @@ const qs = [
 ];
 
 let cur = 0, score = 0, answered = false;
+
+// Función para lanzar la celebración
+function lanzarGlobos() {
+  const duracion = 3 * 1000;
+  const final = Date.now() + duracion;
+
+  (function frame() {
+    confetti({
+      particleCount: 3,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0 },
+      colors: ['#059669', '#6ee7b7', '#3b82f6', '#f472b6']
+    });
+    confetti({
+      particleCount: 3,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1 },
+      colors: ['#059669', '#6ee7b7', '#3b82f6', '#f472b6']
+    });
+
+    if (Date.now() < final) {
+      requestAnimationFrame(frame);
+    }
+  }());
+}
 
 function renderDots(){
   const d = document.getElementById('dots');
@@ -187,17 +236,22 @@ function select(i, btn){
 function showResult(){
   document.getElementById('q-card').style.display = 'none';
   document.getElementById('result-card').style.display = 'block';
+  
   let icon, title;
-  if(score===4){
-    icon='👏'; title='4 de 4 — Excelente, Sonia.';
-  } else if(score>=3){
-    icon='🍀'; title=score+' de 5 — Nada mal.';
+  if(score === qs.length){
+    icon='🏆'; title='¡Perfecto! ' + score + ' de ' + qs.length;
+  } else if(score >= 3){
+    icon='🍀'; title=score + ' de ' + qs.length + ' — ¡Muy bien!';
   } else {
-    icon='☕'; title=score+' de 5 — Hay que tomar más café juntas.';
+    icon='☕'; title=score + ' de ' + qs.length + ' — ¡A por más café!';
   }
+  
   document.getElementById('res-icon').textContent = icon;
   document.getElementById('res-title').textContent = title;
-  document.getElementById('res-msg').textContent = 'Feliz Día del Maestro.🎈';
+  document.getElementById('res-msg').textContent = 'Gracias por todo lo que enseñas y por compartir estos momentos.';
+  
+  // Lanzamos los globos al mostrar el resultado
+  lanzarGlobos();
 }
 
 document.getElementById('start-btn').onclick = ()=>{
