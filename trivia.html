@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trivia para Sonia 🍀</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f0fdf4; font-family: system-ui, sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    #app { max-width: 560px; width: 100%; }
+    .card { background: #fff; border: 1px solid #d1fae5; border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem; }
+    .badge { display: inline-block; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; margin-bottom: 0.75rem; background: #d1fae5; color: #065f46; }
+    .q-text { font-size: 17px; font-weight: 600; color: #1a1a1a; line-height: 1.5; margin-bottom: 1.25rem; }
+    .opts { display: flex; flex-direction: column; gap: 8px; }
+    .opt-btn { text-align: left; padding: 11px 14px; border-radius: 10px; border: 1px solid #e5e7eb; background: #fff; color: #1a1a1a; font-size: 15px; cursor: pointer; line-height: 1.4; transition: background 0.15s; }
+    .opt-btn:hover:not(:disabled) { background: #f9fafb; }
+    .opt-btn.correct { background: #d1fae5; border-color: #6ee7b7; color: #065f46; font-weight: 600; }
+    .opt-btn.wrong { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+    .opt-btn:disabled { cursor: default; }
+    .feedback { font-size: 14px; margin-top: 0.75rem; padding: 10px 12px; border-radius: 8px; line-height: 1.6; display: none; }
+    .feedback.show { display: block; }
+    .feedback.ok { background: #d1fae5; color: #065f46; }
+    .feedback.fail { background: #fee2e2; color: #991b1b; }
+    .nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 1.25rem; }
+    .dots { display: flex; gap: 6px; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #d1d5db; transition: background 0.3s; }
+    .dot.done { background: #6ee7b7; }
+    .dot.active { background: #059669; }
+    .next-btn { padding: 9px 22px; border-radius: 8px; border: 1px solid #d1d5db; background: #fff; color: #1a1a1a; font-size: 14px; cursor: pointer; display: none; }
+    .next-btn:hover { background: #f9fafb; }
+    #intro-card { text-align: center; padding: 2rem 1.5rem; }
+    #intro-card .icon { font-size: 44px; margin-bottom: 1rem; }
+    #intro-card h1 { font-size: 22px; font-weight: 700; color: #065f46; margin-bottom: 0.5rem; }
+    #intro-card p { font-size: 15px; color: #6b7280; line-height: 1.75; margin-bottom: 1.5rem; }
+    #start-btn { padding: 11px 32px; border-radius: 10px; border: none; background: #059669; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
+    #start-btn:hover { background: #047857; }
+    #q-card { display: none; }
+    #result-card { display: none; text-align: center; padding: 2rem 1.5rem; }
+    #result-card .icon { font-size: 48px; margin-bottom: 1rem; }
+    #result-card h2 { font-size: 20px; font-weight: 700; color: #065f46; margin-bottom: 1rem; }
+    #result-card .msg { font-size: 15px; color: #374151; line-height: 1.8; text-align: left; border-left: 3px solid #6ee7b7; padding-left: 1rem; margin-bottom: 0.5rem; }
+    #result-card .firma { font-size: 14px; color: #059669; margin-top: 0.75rem; font-style: italic; }
+    #replay-btn { margin-top: 1.25rem; padding: 10px 26px; border-radius: 10px; border: 1px solid #d1d5db; background: #fff; color: #1a1a1a; font-size: 14px; cursor: pointer; }
+    #replay-btn:hover { background: #f9fafb; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div class="card" id="intro-card">
+    <div class="icon">🍀 ☕ 🎭</div>
+    <h1>Trivia para Sonia</h1>
+    <p>5 preguntas muy específicas.<br>Algunas fáciles, una que otra trampa.<br>Buena suerte, teacher — la vas a necesitar. 😏</p>
+    <button id="start-btn">Empezar →</button>
+  </div>
+
+  <div class="card" id="q-card">
+    <div class="badge" id="q-badge"></div>
+    <div class="q-text" id="q-text"></div>
+    <div class="opts" id="opts"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="nav-row">
+      <div class="dots" id="dots"></div>
+      <button class="next-btn" id="next-btn">Siguiente →</button>
+    </div>
+  </div>
+
+  <div class="card" id="result-card">
+    <div class="icon" id="res-icon"></div>
+    <h2 id="res-title"></h2>
+    <p class="msg" id="res-msg"></p>
+    <p class="firma">— Mariana</p>
+    <button id="replay-btn">Jugar de nuevo</button>
+  </div>
+</div>
+
+<script>
+const qs = [
+  {
+    cat: "☕ Pregunta 1 de 5",
+    q: "Sonia, tu café ideal es...",
+    opts: [
+      "Frío, con hielo y caramelo",
+      "Caliente, solito, sin drama",
+      "Caliente con un toquecito de Baileys porque la vida es corta",
+      "Cualquiera, mientras sea café"
+    ],
+    correct: 2,
+    ok: "Obvio. El café caliente con Baileys no es un capricho, es una filosofía de vida. ☕",
+    fail: "Hmm... ¿en serio? El Baileys dice que no te reconoce. ☕😂"
+  },
+  {
+    cat: "🎭 Pregunta 2 de 5",
+    q: "La primera vez que salieron juntas fue al teatro. ¿Qué obra vieron?",
+    opts: [
+      "La bella durmiente",
+      "El lago de los cisnes",
+      "El Cascanueces",
+      "Romeo y Julieta"
+    ],
+    correct: 2,
+    ok: "¡Sí! El Cascanueces. Un debut teatral de altura. 🎭✨",
+    fail: "Ay, Sonia... fue El Cascanueces. ¡Ese día lo viviste tú! 🎭😄"
+  },
+  {
+    cat: "🎨 Pregunta 3 de 5",
+    q: "Cambiando roles, teacher: ¿cuál es el color favorito de Mariana?",
+    opts: [
+      "Verde, como el trébol",
+      "Morado",
+      "Azul",
+      "Rojo"
+    ],
+    correct: 2,
+    ok: "¡Correcto! Azul. La conoces bien. 🩵",
+    fail: "Era azul, Sonia. Azul. Tarea para casa: conocer mejor a Mariana. 😂🩵"
+  },
+  {
+    cat: "📖 Pregunta 4 de 5",
+    q: "Un libro que las dos leyeron: Cartas del diablo a su sobrino. ¿Quién lo escribió?",
+    opts: [
+      "J.R.R. Tolkien",
+      "C.S. Lewis",
+      "Oscar Wilde",
+      "Edgar Allan Poe"
+    ],
+    correct: 1,
+    ok: "C.S. Lewis. Lectoras de buen gusto, las dos. 📚",
+    fail: "Era C.S. Lewis. Eso sí que es trampa para una lectora. 📚😄"
+  },
+  {
+    cat: "😂 Pregunta 5 de 5",
+    q: "Si por fin le dan el día libre a Sonia, ¿qué hace Mariana?",
+    opts: [
+      "La lleva a tomar café",
+      "Le manda el 🍀",
+      "Le pone un cirio a su amigo el coordinador",
+      "Las tres anteriores, en orden"
+    ],
+    correct: 3,
+    ok: "Las tres, en orden y con dedicación. El coordinador ya sabe lo que hace. 😂🕯️",
+    fail: "Sonia... la respuesta correcta incluye un cirio para el coordinador. Siempre. 😂🕯️"
+  }
+];
+
+let cur = 0, score = 0, answered = false;
+
+function renderDots(){
+  const d = document.getElementById('dots');
+  d.innerHTML = '';
+  qs.forEach((_,i)=>{
+    const dot = document.createElement('div');
+    dot.className = 'dot'+(i<cur?' done':i===cur?' active':'');
+    d.appendChild(dot);
+  });
+}
+
+function renderQ(){
+  const q = qs[cur];
+  document.getElementById('q-badge').textContent = q.cat;
+  document.getElementById('q-text').textContent = q.q;
+  const opts = document.getElementById('opts');
+  opts.innerHTML = '';
+  q.opts.forEach((o,i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = o;
+    btn.onclick = ()=>select(i,btn);
+    opts.appendChild(btn);
+  });
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback';
+  fb.textContent = '';
+  document.getElementById('next-btn').style.display = 'none';
+  answered = false;
+  renderDots();
+}
+
+function select(i, btn){
+  if(answered) return;
+  answered = true;
+  const q = qs[cur];
+  document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+  const fb = document.getElementById('feedback');
+  if(i===q.correct){
+    btn.classList.add('correct');
+    fb.textContent = q.ok;
+    fb.className = 'feedback show ok';
+    score++;
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.opt-btn')[q.correct].classList.add('correct');
+    fb.textContent = q.fail;
+    fb.className = 'feedback show fail';
+  }
+  const nb = document.getElementById('next-btn');
+  nb.style.display = 'block';
+  nb.textContent = cur < qs.length-1 ? 'Siguiente →' : 'Ver resultado →';
+}
+
+function showResult(){
+  document.getElementById('q-card').style.display = 'none';
+  document.getElementById('result-card').style.display = 'block';
+  let icon, title;
+  if(score===5){
+    icon='🏆'; title='5 de 5 — perfecta, Sonia.';
+  } else if(score>=3){
+    icon='🍀'; title=score+' de 5 — nada mal, teacher.';
+  } else {
+    icon='☕'; title=score+' de 5 — hay que tomar más café juntas.';
+  }
+  document.getElementById('res-icon').textContent = icon;
+  document.getElementById('res-title').textContent = title;
+  document.getElementById('res-msg').textContent = 'Hay personas que marcan la diferencia, y tú eres una de ellas. Te admiro mucho, Sonia — por la maestra que eres, por la persona que eres fuera del salón, y por seguir eligiendo enseñar con tanto cariño. Feliz Día del Maestro. 🍀';
+}
+
+document.getElementById('start-btn').onclick = ()=>{
+  document.getElementById('intro-card').style.display = 'none';
+  document.getElementById('q-card').style.display = 'block';
+  renderQ();
+};
+
+document.getElementById('next-btn').onclick = ()=>{
+  cur++;
+  if(cur<qs.length){ renderQ(); } else { showResult(); }
+};
+
+document.getElementById('replay-btn').onclick = ()=>{
+  cur=0; score=0; answered=false;
+  document.getElementById('result-card').style.display = 'none';
+  document.getElementById('q-card').style.display = 'block';
+  renderQ();
+};
+</script>
+</body>
+</html>
